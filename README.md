@@ -17,7 +17,7 @@ php composer.phar require --prefer-dist filsh/yii2-oauth2-server "*"
 or add
 
 ```json
-"filsh/yii2-oauth2-server": "~2.0"
+"filsh/yii2-oauth2-server": "*"
 ```
 
 to the require section of your composer.json.
@@ -25,25 +25,28 @@ to the require section of your composer.json.
 To use this extension,  simply add the following code in your application configuration:
 
 ```php
-'bootstrap' => ['oauth2'],
-'modules' => [
-    'oauth2' => [
-        'class' => 'filsh\yii2\oauth2server\Module',
-        'tokenParamName' => 'accessToken',
-        'tokenAccessLifetime' => 3600 * 24,
-        'storageMap' => [
-            'user_credentials' => 'common\models\User',
+'oauth2' => [
+    'class' => 'filsh\yii2\oauth2server\Module',
+    'options' => [
+        'token_param_name' => 'accessToken',
+        'access_lifetime' => 3600 * 24
+    ],
+    'storageMap' => [
+        'user_credentials' => 'common\models\User'
+    ],
+    'grantTypes' => [
+        'client_credentials' => [
+            'class' => 'OAuth2\GrantType\ClientCredentials',
+            'allow_public_clients' => false
         ],
-        'grantTypes' => [
-            'user_credentials' => [
-                'class' => 'OAuth2\GrantType\UserCredentials',
-            ],
-            'refresh_token' => [
-                'class' => 'OAuth2\GrantType\RefreshToken',
-                'always_issue_new_refresh_token' => true
-            ]
+        'user_credentials' => [
+            'class' => 'OAuth2\GrantType\UserCredentials'
+        ],
+        'refresh_token' => [
+            'class' => 'OAuth2\GrantType\RefreshToken',
+            'always_issue_new_refresh_token' => true
         ]
-    ]
+    ],
 ]
 ```
 
@@ -62,7 +65,7 @@ add url rule to urlManager
 ```php
 'urlManager' => [
     'rules' => [
-        'POST oauth2/<action:\w+>' => 'oauth2/rest/<action>',
+        'POST oauth2/<action:\w+>' => 'oauth2/default/<action>',
         ...
     ]
 ]
@@ -102,38 +105,5 @@ class Controller extends \yii\rest\Controller
     }
 }
 ```
-
-Create action authorize in site controller for Authorization Code
-
-`https://api.mysite.com/authorize?response_type=code&client_id=TestClient&redirect_uri=https://fake/`
-
-[see more](http://bshaffer.github.io/oauth2-server-php-docs/grant-types/authorization-code/)
-
-```php
-/**
- * SiteController
- */
-class SiteController extends Controller
-{
-    /**
-     * @return mixed
-     */
-    public function actionAuthorize()
-    {
-        if (Yii::$app->getUser()->getIsGuest())
-            return $this->redirect('login');
-    
-        /** @var $module \filsh\yii2\oauth2server\Module */
-        $module = Yii::$app->getModule('oauth2');
-        $response = $module->handleAuthorizeRequest(!Yii::$app->getUser()->getIsGuest(), Yii::$app->getUser()->getId());
-    
-        /** @var object $response \OAuth2\Response */
-        Yii::$app->getResponse()->format = \yii\web\Response::FORMAT_JSON;
-    
-        return $response->getParameters();
-    }
-}
-```
-
 
 For more, see https://github.com/bshaffer/oauth2-server-php

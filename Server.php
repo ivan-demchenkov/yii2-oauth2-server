@@ -28,7 +28,7 @@ class Server extends \OAuth2\Server
         if($request === null) {
             $request = $this->module->getRequest();
         }
-        return parent::verifyResourceRequest($request, $response, $scope);
+        parent::verifyResourceRequest($request, $response, $scope);
     }
     
     public function handleTokenRequest(\OAuth2\RequestInterface $request = null, \OAuth2\ResponseInterface $response = null)
@@ -38,16 +38,16 @@ class Server extends \OAuth2\Server
         }
         return parent::handleTokenRequest($request, $response);
     }
-
-    public function handleAuthorizeRequest(\OAuth2\RequestInterface $request = null, \OAuth2\ResponseInterface $response = null, $isAuthorized = false, $userId = null)
+    
+    
+    public function handleAuthorizeRequest(\OAuth2\RequestInterface $request = null, \OAuth2\ResponseInterface $response = null, $is_authorized = false, $user_id = null)
     {
-        if($request === null) {
+        if($request === null)
             $request = $this->module->getRequest();
-        }
-        if($response === null) {
+
+        if($response === null)
             $response = $this->module->getResponse();
-        }
-        
-        return parent::handleAuthorizeRequest($request, $response, $isAuthorized, $userId);
+
+        return parent::handleAuthorizeRequest($request, $response, $is_authorized, $user_id);
     }
 }

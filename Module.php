@@ -28,10 +28,8 @@ use yii\i18n\PhpMessageSource;
  * ]
  * ```
  */
-class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
+class Module extends \yii\base\Module
 {
-    use BootstrapTrait;
-    
     const VERSION = '2.0.0';
     
     /**
@@ -48,38 +46,16 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
      * @var array GrantTypes collection
      */
     public $grantTypes = [];
-
-    /**
-     * @var array ResponseTypes collection
-     */
-    public $responseTypes = [];
     
     /**
-     * @var string Name of access token parameter
+     * @var string name of access token parameter
      */
     public $tokenParamName;
     
     /**
-     * @var integer Max access token lifetime in seconds
+     * @var type max access lifetime
      */
     public $tokenAccessLifetime;
-    
-    /**
-     * @var integer Max refresh token lifetime in seconds
-     */
-    public $tokenRefreshLifetime;
-    
-    /**
-     * @inheritdoc
-     */
-    public function bootstrap($app)
-    {
-        $this->initModule($this);
-        
-        if ($app instanceof \yii\console\Application) {
-            $this->controllerNamespace = 'filsh\yii2\oauth2server\commands';
-        }
-    }
     
     /**
      * @inheritdoc
@@ -126,11 +102,9 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
                 [
                     'token_param_name' => $this->tokenParamName,
                     'access_lifetime' => $this->tokenAccessLifetime,
-                    'refresh_token_lifetime' => $this->tokenRefreshLifetime,
                     /** add more ... */
                 ],
-                $grantTypes,
-                $this->responseTypes
+                $grantTypes
             ]);
 
             $this->set('server', $server);
@@ -154,6 +128,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         return $this->get('response');
     }
 
+    
     /**
      * @param $response
      */
@@ -162,24 +137,23 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         Yii::$app->response->setStatusCode($response->getStatusCode());
         $headers = Yii::$app->response->getHeaders();
 
-        foreach ($response->getHttpHeaders() as $name => $value) {
+        foreach ($response->getHttpHeaders() as $name => $value)
             $headers->set($name, $value);
-        }
     }
 
     /**
-     * @param $isAuthorized
-     * @param $userId
+     * @param $is_authorized
+     * @param $user_id
      * @return \OAuth2\ResponseInterface
      * @throws \yii\base\InvalidConfigException
      */
-    public function handleAuthorizeRequest($isAuthorized, $userId)
+    public function handleAuthorizeRequest($is_authorized, $user_id)
     {
         $response = $this->getServer()->handleAuthorizeRequest(
             $this->getRequest(),
             $this->getResponse(),
-            $isAuthorized,
-            $userId
+            $is_authorized,
+            $user_id
         );
         $this->setResponse($response);
 

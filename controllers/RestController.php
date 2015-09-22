@@ -13,17 +13,19 @@ class RestController extends \yii\rest\Controller
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-            'exceptionFilter' => [
-                'class' => ErrorToExceptionFilter::className()
-            ],
-        ]);
+            return ArrayHelper::merge(parent::behaviors(), [
+                    'exceptionFilter' => [
+                            'class' => ErrorToExceptionFilter::className()
+                    ],
+            ]);
     }
-
+    
     public function actionToken()
     {
-        /** @var $response \OAuth2\Response */
-        $response = $this->module->getServer()->handleTokenRequest();
-        return $response->getParameters();
+            $response = $this->module->getServer()->handleTokenRequest();
+
+            /** @var $response \OAuth2\Response */
+
+            return $response->getParameters();
     }
 }
